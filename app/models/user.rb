@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  attr_accessor :remember_token
   before_save { self.email = email.downcase }
 
   validates :name,  presence: true, length: { maximum: 50 }
@@ -7,6 +8,10 @@ class User < ApplicationRecord
   validates :email, presence: true, length: { maximum: 100 },
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true
+  
+  validates :belonging, length: { in: 2..30 }, allow_blank: true
+  validates :basic_time, presence: true
+  validates :work_time, presence: true
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
@@ -32,6 +37,8 @@ class User < ApplicationRecord
   end
   
   def authenticated?(remember_token)
+    # ダイジェストが存在しない場合はfalseを返して終了します。
+    return false if remember_digest.nil?
     BCrypt::Password.new(remember_digest).is_password?(remember_token)
   end
   
