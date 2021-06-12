@@ -1,7 +1,21 @@
 <% provide(:title, 'All Users') %>
+
+<% if params[:search] %>
+<h1>検索結果</h1>
+<% else %>
 <h1>ユーザー一覧</h1>
+<% end %>
+
+<div class="search">
+<h5>ユーザ名検索</h5>
+<%= form_tag(users_path, :method => 'get') do %>
+  <%= text_field_tag :search %>
+  <%= submit_tag '検索', :name => nil %>
+<% end %>
+</div>
 
 <div class="col-md-10 col-md-offset-1">
+  <%= will_paginate %>
   <table class="table table-condensed table-hover" id="table-users">
     <thead>
       <tr>
@@ -12,7 +26,6 @@
     <% @users.each do |user| %>
       <tr>
         <td><%= link_to user.name, user %></td>
-      
       </tr>
     <% end %>
   </table>

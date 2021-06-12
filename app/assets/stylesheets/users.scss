@@ -51,13 +51,24 @@
   }  
 }
 
-/* 基本情報編集モーダルウインドウ */
-
-.label-basic-info {
+/* 更新ページ */
+.label-update-time {
   margin-top: 5px;
 }
 
 .btn-basic-info {
   margin: 15px 0;
   width: 30%;
+}
+
+.wday0 {
+  color: red;
+}
+
+.wday6 {
+  color: blue;
+}
+
+.search{
+  float: right;
 }
