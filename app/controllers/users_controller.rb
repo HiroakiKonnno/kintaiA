@@ -1,9 +1,11 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :correct_user, only: [:edit, :update, :show]
+  before_action :correct_user, only: [:edit, :update]
+  before_action :admin_or_correct_user, only: [:show]
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index]
   before_action :set_one_month, only: :show
+  
   
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
@@ -72,6 +74,14 @@ class UsersController < ApplicationController
    def basic_info_params
       params.require(:user).permit(:basic_time, :work_time)
    end
+
+   def admin_or_correct_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.admin?
+      flash[:danger] = "編集権限がありません。"
+      redirect_to(root_url)
+    end  
+  end
 
 end
    
