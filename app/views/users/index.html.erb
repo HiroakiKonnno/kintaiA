@@ -6,6 +6,15 @@
 <h1>ユーザー一覧</h1>
 <% end %>
 
+<div>
+<%= form_tag import_users_path, multipart: true do %>
+  <%= file_field_tag :file %>
+  </div>
+  <div>
+  <%= submit_tag "CSVをインポート" %>
+  </div>
+<% end %>
+
 <div class="search">
 <h5>ユーザ名検索</h5>
 <%= form_tag(users_path, :method => 'get') do %>
@@ -22,11 +31,18 @@
         <th><%= User.human_attribute_name :name %></th>
       </tr>
     </thead>
-
+　　
     <% @users.each do |user| %>
-      <tr>
-        <td><%= link_to user.name, user %></td>
-      </tr>
+    <div><%= user.name %></div>
+    <div><%= link_to "削除", user_path(user.id), method: :delete, class: "btn btn-success"%></div>
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#<%= user.id %>">編集</button>
+      <div id="<%= user.id %>" class="collapse">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+            <%= render 'form', {user: user} %>
+          </div>
+        </div>
+      </div>
     <% end %>
   </table>
   <%= will_paginate %>
