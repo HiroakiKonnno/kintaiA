@@ -1,0 +1,17 @@
+<h1>出勤中社員一覧</h1>
+<table class="table table-condensed table-hover" id="table-users">
+  <thread>
+    <tr>
+      <th>社員番号</th>
+      <th>名前</th>
+    </tr>
+  </thead>
+　<tbody>
+  <% @employees.each do |user| %>
+    <tr>
+      <td><%= @user.employee_number %></td>
+      <td><%= @user.name %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

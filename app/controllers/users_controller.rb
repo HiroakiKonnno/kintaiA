@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :logged_in_user, only: [:employee, :index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :correct_user, only: [:update]
   before_action :admin_or_correct_user, only: [:edit,:show]
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index]
@@ -17,6 +17,17 @@ class UsersController < ApplicationController
   else
     User.paginate(page: params[:page])
   end
+  
+  end
+
+  def employee
+    @user = User.find(params[:id])
+    @users = if params[:search]
+      User.paginate(page: params[:page]).where('name LIKE ?',"%#{params[:search]}%")
+  else
+      User.paginate(page: params[:page])
+  end
+    @employees = @user.attendances.where.not(started_at: nil).where(finished_at: nil)
   end
 
   def import
@@ -46,7 +57,7 @@ class UsersController < ApplicationController
   @user = User.find(params[:id])
   if @user.update_attributes(user_params)
     flash[:success] = "ユーザー情報を更新しました。"
-    redirect_to @user
+    redirect_to users_path
   else
     render :edit
   end
@@ -74,7 +85,7 @@ class UsersController < ApplicationController
    private
    
    def user_params
-      params.permit(:name, :email, :belonging, :employee_number, :uid, :password, :password_confirmation, :basic_time, :designated_work_start_time, :designated_work_end_time)
+      params.require(:user).permit(:name, :email, :belonging, :employee_number, :uid, :password, :password_confirmation, :basic_time, :designated_work_start_time, :designated_work_end_time)
    end
    
    def basic_info_params
