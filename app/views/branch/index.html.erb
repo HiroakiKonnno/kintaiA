@@ -1,0 +1,32 @@
+<h1>拠点一覧</h1>
+<table class="table table-condensed table-hover" id="table-users">
+  <thread>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>拠点番号</th>
+      <th>拠点名</th>
+      <th>勤怠種類</th>
+    </tr>
+  </thead>
+<tbody>
+<tr>
+<% @branches.each do |branch| %>
+  <th><%= link_to "修正", edit_branch_path(branch.id), class: "btn btn-success" %></th>
+  <th><%= link_to "削除", branch_path(branch.id), method: :delete, class: "btn btn-success" %></th>
+  <th><%= branch.number %></th>
+  <th><%= branch.name %></th>
+  <th><%= branch.kind %></th>
+<% end %>
+</tr>
+<tr>
+<%= form_with(xml: @branches, local: true) do |f| %>
+  <th><%= f.submit "拠点情報追加", class: "btn btn-primary btn-block" %></th>
+  <th></th>
+  <th><%= f.text_field :number, class: "form-control" %></th>
+  <th><%= f.text_field :name, class: "form-control" %></th>
+  <th><%= f.text_field :kind, class: "form-control" %></th>
+<% end %>
+</tr>
+  </tbody>
+</table>

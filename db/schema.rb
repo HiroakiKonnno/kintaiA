@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210627053310) do
+ActiveRecord::Schema.define(version: 20210723082132) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -18,9 +18,19 @@ ActiveRecord::Schema.define(version: 20210627053310) do
     t.datetime "finished_at"
     t.string "note"
     t.integer "user_id"
+    t.datetime "work_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
+  end
+
+  create_table "branches", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "kind"
+    t.integer "number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -32,14 +42,13 @@ ActiveRecord::Schema.define(version: 20210627053310) do
     t.string "belonging"
     t.string "remember_digest"
     t.boolean "admin", default: false
-    t.datetime "basic_time", default: "2021-06-19 23:00:00"
-    t.datetime "work_time", default: "2021-06-19 22:30:00"
-    t.integer "basic_work_time"
+    t.datetime "basic_time", default: "2021-07-22 23:00:00"
+    t.datetime "work_time", default: "2021-07-22 22:30:00"
     t.integer "employee_number"
     t.integer "uid"
     t.boolean "superior", default: false
-    t.datetime "designated_work_start_time", default: "2021-07-03 22:30:00"
-    t.datetime "designated_work_end_time", default: "2021-07-03 22:30:00"
+    t.datetime "designated_work_start_time", default: "2021-07-22 22:30:00"
+    t.datetime "designated_work_end_time", default: "2021-07-22 22:30:00"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
