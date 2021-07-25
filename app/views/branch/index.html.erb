@@ -12,8 +12,8 @@
 <tbody>
 <tr>
 <% @branches.each do |branch| %>
-  <th><%= link_to "修正", edit_branch_path(branch.id), class: "btn btn-success" %></th>
-  <th><%= link_to "削除", branch_path(branch.id), method: :delete, class: "btn btn-success" %></th>
+  <th><%= link_to "修正", edit_branch_path(branch.id), class: "btn btn-primary" %></th>
+  <th><%= link_to "削除", branch_path(branch.id), method: :delete, class: "btn btn-primary" %></th>
   <th><%= branch.number %></th>
   <th><%= branch.name %></th>
   <th><%= branch.kind %></th>
