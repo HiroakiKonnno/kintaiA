@@ -1,0 +1,28 @@
+<h1>勤怠ログ</h1>
+  
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+  <tr>
+      <div>
+        <%= date_select 'date-with-stylesheet', '', {discard_day: true}, {class: "form-control bootstrap-date-only-width"} %>
+      </div>
+  </tr>
+      <tr>
+        <th>日付</th>
+        <th>変更前出社時間</th>
+        <th>変更前退社時間</th>
+        <th>変更後出社時間</th>
+        <th>変更後退社時間</th>
+        <th>指示者</th>
+        <th>承認日</th>
+      </tr>
+   
+      <tr>
+        <th><%=  %></th>
+        <th><%= %></th>
+        <th><%=  %></th>
+        <th><%=  %></th>
+        <th><%=  %></th>
+        <th><%=  %></th>
+      </tr>
+
+  </table>
