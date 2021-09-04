@@ -28,8 +28,8 @@ class AttendancesController < ApplicationController
   end
   
   def edit_one_month
-    
   end
+
   
   def update_one_month
      ActiveRecord::Base.transaction do
@@ -49,6 +49,15 @@ class AttendancesController < ApplicationController
    rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
    flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
    redirect_to attendances_edit_one_month_user_url(date: params[:date])
+   end
+
+   def monthly_confirmation
+    @first_day = params[:date].nil? ?
+    Date.current.beginning_of_month : params[:date].to_date
+    @last_day = @first_day.end_of_month
+    one_month = [*@first_day..@last_day] # 対象の月の日数を代入します。
+    # ユーザーに紐付く一ヶ月分のレコードを検索し取得します。
+    @attendances = @user.attendances.where(worked_on: @first_day..@last_day)
    end
 
   

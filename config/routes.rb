@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       patch 'attendances/update_one_month'
       get 'employee'
       get 'attendances/user_log'
+      patch 'update_confirmation'
     end
     resources :attendances, only: :update # この行を追加します。
   end

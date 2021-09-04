@@ -22,7 +22,7 @@
   </table>
 </div>
 
-<% if @user.belonging == "上長" %>
+<% if @user.belonging == "上長A" || @user.belonging == "上長B" %>
 <div>
   <td><%= link_to "【所属長承認申請のお知らせ】", "#" %></td>
 </div>
@@ -118,21 +118,20 @@
         <td colspan="1"></td>
         <td colspan="1"></td>
         <td colspan="1">
-          <th>
+       <th>
           <div>所属長承認 未</div>
           <div>
-            <select name="pref">
-　　　　　   <option>
-              
-            </option>
-　　　　　  </select>
+          <%= form_with model: @user, url: update_confirmation_user_path(@user) do |f| %>
+            <table>
+              <%= f.select :month_sperior, ['上長A', '上長B'], class: 'sample' %>
+              <%= f.submit '送信', class: 'btn btn-primary btn-block' %>
+            </table>
+            <% end %>
           </div>
-          <div>
-           <%= link_to "勤怠編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
-          </div>
-          </th>
-        </td>
+        </th>
       </tr>
     </tfoot> 
   </table>
 </div>
+<!--モーダルウインドウ表示-->
+<div id="edit-basic-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

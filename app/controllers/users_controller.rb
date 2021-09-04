@@ -73,13 +73,20 @@ class UsersController < ApplicationController
   end
 
   def update_basic_info
-  @user = User.find(params[:id])
-  if @user.update_attributes(basic_info_params)
-    flash[:success] = "基本情報を更新しました。"
-  else
-    flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+    @user = User.find(params[:id])
+    if @user.update_attributes(basic_info_params)
+      flash[:success] = "基本情報を更新しました。"
+    else
+      flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+    end
+    redirect_to @user
   end
-  redirect_to @user
+
+  def update_confirmation
+    @user = User.find(params[:id])
+    @user.update_attributes(confirmation_info_params)
+      flash[:success] = "送信は成功しました。"
+      redirect_to @user
   end
   
    private
@@ -90,6 +97,10 @@ class UsersController < ApplicationController
    
    def basic_info_params
       params.require(:user).permit(:basic_time)
+   end
+
+   def confirmation_info_params
+    params.require(:user).permit(:month_sperior).merge(id: @user.id,month_status: "申請中",apply_month: params[:date])
    end
 
    def admin_or_correct_user

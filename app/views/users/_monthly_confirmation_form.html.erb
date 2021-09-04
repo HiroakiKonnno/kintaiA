@@ -1,0 +1,28 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+  <% @user.each do |user| %>
+    <h1><%= user.name %>からの1ヶ月分勤怠申請</h1>
+    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <thead>
+      <tr>
+        <th>月</th>
+        <th>指示確認㊞</th>
+        <th>変更</th>
+        <th>勤怠を確認する</th>
+      </tr>
+      <% @user.each do |day| %>
+      <%= form_with(model: @user, local: true) do |f| %>
+      <tr>
+        <th><%= "#{day.apply_month.mon}月" %></th>
+        <th><%= f.select :month_status, ['申請中', '承認','否認'], class: 'sample' %></th>
+        <th><%= f.check_box :month_modify, {class: "check_box"}, true, false %></th>
+        <th><%= link_to "確認", user_path(day) ,class:btn btn-primary" %></th>
+      </tr>
+    </thead>
+    <% end %>
+    <% end %>
+    </table>
+    <% end %>
+  </div>
+</div>
+  
