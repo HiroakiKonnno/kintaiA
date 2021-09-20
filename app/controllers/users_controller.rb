@@ -4,11 +4,13 @@ class UsersController < ApplicationController
   before_action :correct_user, only: [:update]
   before_action :admin_or_correct_user, only: [:edit,:show]
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index]
-  before_action :set_one_month, only: :show
+  before_action :set_one_month, only: [:show]
   
   
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
+    @count = Attendance.where(month_status: '申請中', month_sperior: @user.belonging).count
+    @approval = Attendance.where(month_status: '承認', user_id: @user.id, worked_on: params[:worked_on])
   end
   
   def index
@@ -84,12 +86,35 @@ class UsersController < ApplicationController
 
   def update_confirmation
     @user = User.find(params[:id])
-    @user.update_attributes(confirmation_info_params)
+    @attendance = @user.attendances.where(worked_on: params[:worked_on])
+    @attendance.update(confirmation_info_params)
       flash[:success] = "送信は成功しました。"
       redirect_to @user
   end
+
+  def monthly_confirmation_info
+    @user = User.find(params[:id])
+    @attendance = @user.attendances.where(worked_on: params[:worked_on])
+    @attendances = Attendance.where(month_status: '申請中', month_sperior: @user.belonging).group_by(&:user_id)
+  end
+
+  def approve_monthly_info
+    @approver = User.find(params[:id])
+    @attendances = Attendance.where(month_status: '申請中', month_sperior: @approver.belonging)
+      approve_monthly_params.each do |id, item|
+        @attendance = Attendance.find(id)
+        if item[:month_modify] == "true"
+          @attendance.update(item)
+          flash[:success] = "更新しました"
+        else
+          flash[:danger] = "更新できなかったものあります"
+        end
+      end
+    redirect_to @approver
+  end
+
   
-   private
+     private
    
    def user_params
       params.require(:user).permit(:name, :email, :belonging, :employee_number, :uid, :password, :password_confirmation, :basic_time, :designated_work_start_time, :designated_work_end_time)
@@ -99,16 +124,21 @@ class UsersController < ApplicationController
       params.require(:user).permit(:basic_time)
    end
 
-   def confirmation_info_params
-    params.require(:user).permit(:month_sperior).merge(id: @user.id,month_status: "申請中",apply_month: params[:date])
-   end
-
+  
    def admin_or_correct_user
     @user = User.find(params[:user_id]) if @user.blank?
     unless current_user?(@user) || current_user.admin?
       flash[:danger] = "編集権限がありません。"
       redirect_to(root_url)
     end  
+   end
+
+   def confirmation_info_params
+    params.permit(:month_sperior).merge(month_status: "申請中", worked_on: params[:worked_on])
+   end
+
+   def approve_monthly_params
+    params.require(:user).permit(attendances: [:month_status, :month_modify])[:attendances]
    end
 
 end
