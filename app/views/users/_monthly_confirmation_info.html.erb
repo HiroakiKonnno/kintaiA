@@ -19,7 +19,7 @@
                   <th><%= day.worked_on.month %>月</th>
                   <th><%= update.select :month_status, ['申請中', '承認','否認','なし'], class: 'sample' %></th>
                   <th><%= update.check_box :month_modify, {class: "check_box"}, "true", "false" %></th>
-                  <th><%= link_to "確認", "#", class: "btn btn-primary" %></th>
+                  <th><%= link_to "確認", user_path(user, date: day.worked_on), class: "btn btn-primary" %></th>
               </thead>
             </table>
           <% end %>

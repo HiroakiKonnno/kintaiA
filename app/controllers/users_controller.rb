@@ -10,7 +10,8 @@ class UsersController < ApplicationController
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
     @count = Attendance.where(month_status: '申請中', month_sperior: @user.belonging).count
-    @approval = Attendance.where(month_status: '承認', user_id: @user.id, worked_on: params[:worked_on])
+    @approval = Attendance.find_by(month_status: '承認', worked_on: @first_day, user_id: @user.id)
+    @deny = Attendance.find_by(month_status: '否認', worked_on: @first_day, user_id: @user.id)
   end
   
   def index
@@ -111,6 +112,7 @@ class UsersController < ApplicationController
         end
       end
     redirect_to @approver
+    debugger
   end
 
   
