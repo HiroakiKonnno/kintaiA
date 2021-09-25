@@ -32,10 +32,10 @@
       <% end %>
     </div>
     <div>
-      <%= link_to "【勤怠変更申請のお知らせ】", "#" %>
+      <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
     </div>
     <div>
-      <%= link_to "【勤怠変更申請のお知らせ】", "#" %>
+      <%= link_to "【残業申請のお知らせ】", "#" %>
     </div>
   <% end %>
   <% if @user == current_user %>
@@ -81,6 +81,10 @@
 
     <tbody>
       <% @attendances.each do |day| %>
+        <% if day.day_status == '承認' %>
+          <% day.started_at = day.before_changed_started_at %>
+          <% day.finished_at = day.before_changed_finished_at %>
+        <% end %>
         <tr>
           <% if @user == current_user %>
             <td><%= link_to "残業申請", "#", class: "btn btn-primary" %></td>
@@ -110,7 +114,14 @@
           <td></td>
           <td></td>
           <td></td>
-          <td></td>
+          <td>
+            <% if day.day_status == '承認' %>
+              勤怠編集を承認しました
+            <% elsif day.day_status == '否認' %>
+              勤怠編集を否認しました
+            <% else %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
@@ -152,3 +163,4 @@
 </div>
 
 <div id="monthly-confirmation-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="change-month" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

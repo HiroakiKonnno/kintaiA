@@ -112,7 +112,6 @@ class UsersController < ApplicationController
         end
       end
     redirect_to @approver
-    debugger
   end
 
   

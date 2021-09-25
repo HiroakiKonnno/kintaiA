@@ -5,5 +5,9 @@ class AddColumnsToAttendances < ActiveRecord::Migration[5.1]
     add_column :attendances, :month_sperior, :string
     add_column :attendances, :month_status, :string
     add_column :attendances, :month_modify, :boolean, default: false
+    add_column :attendances, :day_modify, :boolean, default: false
+    add_column :attendances, :day_status, :string
+    add_column :attendances, :day_tomorrow, :boolean, default: false
+    add_column :attendances, :day_sperior, :string
   end
 end

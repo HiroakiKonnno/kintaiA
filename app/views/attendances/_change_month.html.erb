@@ -1,0 +1,63 @@
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <%= form_with model: @user, url: attendances_change_approval_user_path(@user), local: true, method: :patch do |f| %>
+      <% @attendances.each do |user_id, attendances| %>
+        <div class="modal-header">
+          <% user = User.find(user_id) %>
+          <h1 class="modal-title"><%= user.name %>からの勤怠変更申請</h1>
+        </div>
+        <% attendances.each do |day| %>
+          <%= f.fields_for "attendances[]", day do |update| %>
+            <table class="table table-bordered table-condensed table-hover">
+              <tr>
+                <th rowspan="3">日付</th>
+                <th rowspan="3">曜日</th>
+                <th colspan="4">変更前</th>
+                <th colspan="4">変更後</th>
+                <th rowspan="3">備考</th>
+                <th rowspan="3">指示者確認㊞</th>
+                <th rowspan="3">変更</th>
+                <th rowspan="3">勤怠を確認する</th>
+              </tr>
+              <tr>
+                <th colspan="2">出社</th>
+                <th colspan="2">退社</th>
+                <th colspan="2">出社</th>
+                <th colspan="2">退社</th>
+              </tr>
+              <tr>
+                <th>時</th>
+                <th>分</th>
+                <th>時</th>
+                <th>分</th>
+                <th>時</th>
+                <th>分</th>
+                <th>時</th>
+                <th>分</th>
+              </tr>
+              <tr>
+                <th><%= l(day.worked_on, format: :short) %></th>
+                <th class='<%= "wday#{day.worked_on.wday}"%>'> <%=$days_of_the_week[day.worked_on.wday] %></th>
+                <th><%= l(day.started_at, format: :hour) if day.started_at.present? %></th>
+                <th><%= l(day.started_at.floor_to(15.minutes), format: :minute) if day.started_at.present? %></th>
+                <th><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></th>
+                <th><%= l(day.finished_at.floor_to(15.minutes), format: :minute) if day.finished_at.present? %></th>
+                <th><%= l(day.before_changed_started_at, format: :hour) if day.before_changed_started_at.present? %></th>
+                <th><%= l(day.before_changed_started_at.floor_to(15.minutes), format: :minute) if day.before_changed_started_at.present? %></th>
+                <th><%= l(day.before_changed_finished_at, format: :hour) if day.before_changed_finished_at.present? %></th>
+                <th><%= l(day.before_changed_finished_at.floor_to(15.minutes), format: :minute) if day.before_changed_finished_at.present? %></th>
+                <th><%= day.note %></th>
+                <th><%= update.select :day_status, ['申請中', '承認','否認','なし'], class: 'sample' %></th>
+                <th><%= update.check_box :day_modify, {class: "check_box"}, "true", "false" %></th>
+                <th><%= link_to "確認", user_path(user, date: day.worked_on), class: "btn btn-primary" %></th>
+              </tr>
+            </table>
+          <% end %>
+        <% end %>
+        <div class = "center">
+          <%= f.submit "変更を送信する", class: "btn btn-lg btn-primary" %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

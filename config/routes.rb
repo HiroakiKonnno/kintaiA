@@ -23,6 +23,8 @@ Rails.application.routes.draw do
       patch 'update_confirmation'
       get 'edit_basic_info'
       patch 'update_basic_info'
+      get 'attendances/change_month'
+      patch 'attendances/change_approval'
     end
     resources :attendances, only: :update # この行を追加します。
   end
