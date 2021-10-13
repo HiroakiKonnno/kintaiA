@@ -25,8 +25,13 @@ Rails.application.routes.draw do
       patch 'update_basic_info'
       get 'attendances/change_month'
       patch 'attendances/change_approval'
+      get 'attendances/overtime_view'
+      patch 'attendances/overtime_confirmation'
+      get 'attendances/overtime_info'
+      patch 'attendances/overtime_approval'
     end
     resources :attendances, only: :update # この行を追加します。
+    
   end
 
   resources :branch 

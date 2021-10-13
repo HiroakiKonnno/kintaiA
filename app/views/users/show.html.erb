@@ -20,24 +20,38 @@
       <td>締め：<%= l(@last_day, format: :short) %></td>
     </tr>
   </table>
-  <% if @user.belonging == "上長A" || @user.belonging == "上長B" %>
-    <div>
-      <% if @count == 0 %>
-        <%= link_to "【所属長承認申請のお知らせ】", monthly_confirmation_info_user_path, remote: true %>
-      <% else %>
-        <%= link_to "【所属長承認申請のお知らせ】", monthly_confirmation_info_user_path, class: "link", remote: true %>
-        <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
-          <%= @count %>個の通知があります
-        </span>
-      <% end %>
-    </div>
-    <div>
-      <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
-    </div>
-    <div>
-      <%= link_to "【残業申請のお知らせ】", "#" %>
-    </div>
-  <% end %>
+    <% if @user.belonging == "上長A" || @user.belonging == "上長B" %>
+      <div class = 'dec'>
+        <% if @month_count == 0 %>
+          <%= link_to "【所属長承認申請のお知らせ】", monthly_confirmation_info_user_path, remote: true %>
+        <% else %>
+          <%= link_to "【所属長承認申請のお知らせ】", monthly_confirmation_info_user_path, class: "link", remote: true %>
+          <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
+            <%= @month_count %>個の通知があります
+          </span>
+        <% end %>
+      </div>
+      <div class = 'dec'>
+        <% if @day_count == 0 %>
+          <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
+        <% else %>
+          <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
+          <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
+            <%= @day_count %>個の通知があります
+          </span>
+        <% end %>
+      </div>
+      <div class = 'dec'>
+        <% if @overtime_count == 0 %>
+          <%= link_to "【残業申請のお知らせ】", attendances_overtime_view_user_path, remote: true %>
+        <% else %>
+          <%= link_to "【残業申請のお知らせ】", attendances_overtime_view_user_path, remote: true %>
+          <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
+            <%= @overtime_count %>個の通知があります
+          </span>
+        <% end %>
+      </div>
+    <% end %>
   <% if @user == current_user %>
     <div class="btn-users-show">
       <%= link_to "勤怠編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
@@ -87,7 +101,7 @@
         <% end %>
         <tr>
           <% if @user == current_user %>
-            <td><%= link_to "残業申請", "#", class: "btn btn-primary" %></td>
+            <td><%= link_to "残業申請", attendances_overtime_info_user_path(@user, date:day.worked_on), remote: true, class: "btn btn-primary" %></td>
           <% elsif %>
             <td></td>
           <% end %>
@@ -109,7 +123,7 @@
               <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
-          <td></td>
+          <td><%= day.note %></td>
           <td></td>
           <td></td>
           <td></td>
@@ -164,3 +178,5 @@
 
 <div id="monthly-confirmation-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="change-month" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="overtime-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="overtime-view" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

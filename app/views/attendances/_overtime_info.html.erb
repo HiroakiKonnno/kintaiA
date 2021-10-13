@@ -1,0 +1,30 @@
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <%= form_with model: @attendance, url: attendances_overtime_confirmation_user_path(@user), local: true, method: :patch do |f| %>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title">残業申請</h1>
+      </div>
+      <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+        <tr>
+          <td>日付</td>
+          <td>曜日</td>
+          <td>終了時間</td>
+          <td>翌日</td>
+          <td>業務内容</td>
+          <td>指示者確認</td>
+        </tr>
+        <tr>
+          <td><%= l(@attendance.worked_on, format: :short) %></td>
+          <td class='<%= "wday#{@attendance.worked_on.wday}"%>'> <%= %w{日 月 火 水 木 金 土}[@attendance.worked_on.wday] %></td>
+          <td><%= f.time_field :overwork_time, class: "form-control" %></td>
+          <th><%= f.check_box :overwork_tomorrow, {class: "check_box"}, "true", "false" %></th>
+          <td><%= f.text_field :overwork_note, class: "form-control" %></td>
+          <td><%= f.select :overwork_sperior,['上長A', '上長B'], include_blank: true, class: 'sample' %></td>
+        </tr>
+      </table>
+      <div class="center">
+        <%= f.submit "残業を申請する", class: "btn btn-lg btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

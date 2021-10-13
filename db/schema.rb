@@ -30,6 +30,12 @@ ActiveRecord::Schema.define(version: 20210811074236) do
     t.string "day_status"
     t.boolean "day_tomorrow", default: false
     t.string "day_sperior"
+    t.string "overwork_status"
+    t.boolean "overwork_tomorrow", default: false
+    t.datetime "overwork_time"
+    t.string "overwork_note"
+    t.string "overwork_sperior"
+    t.boolean "overwork_modify", default: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
@@ -51,13 +57,13 @@ ActiveRecord::Schema.define(version: 20210811074236) do
     t.string "belonging"
     t.string "remember_digest"
     t.boolean "admin", default: false
-    t.datetime "basic_time", default: "2021-09-22 23:00:00"
-    t.datetime "work_time", default: "2021-09-22 22:30:00"
+    t.datetime "basic_time", default: "2021-10-02 23:00:00"
+    t.datetime "work_time", default: "2021-10-02 22:30:00"
     t.integer "employee_number"
     t.integer "uid"
     t.boolean "superior", default: false
-    t.datetime "designated_work_start_time", default: "2021-09-22 22:30:00"
-    t.datetime "designated_work_end_time", default: "2021-09-22 22:30:00"
+    t.datetime "designated_work_start_time", default: "2021-10-02 22:30:00"
+    t.datetime "designated_work_end_time", default: "2021-10-02 22:30:00"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 

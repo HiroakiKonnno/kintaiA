@@ -76,6 +76,44 @@ class AttendancesController < ApplicationController
   end
 
 
+  def overtime_info
+    @user = User.find(params[:id])
+    @attendance = @user.attendances.find_by(worked_on: params[:date])
+  end
+
+  def overtime_confirmation
+    @attendance = Attendance.find(params[:id])
+    if overtime_confirmation_params[:overwork_time].present?
+      @attendance.update_attributes(overtime_confirmation_params)
+      flash[:success] = "勤怠情報を更新しました。"
+      redirect_to user_url(date: params[:date])
+    else
+      flash[:danger] = "終了時間が未入力です"
+      redirect_to user_url(date: params[:date])
+    end
+  end
+
+  def overtime_view
+    @user = User.find(params[:id])
+    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.belonging).group_by(&:user_id)
+  end
+
+  def overtime_approval
+    @user = User.find(params[:id])
+    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.belonging)
+    overtime_approval_params.each do |id, item|
+      @attendance = Attendance.find(id)
+      if item[:overtime_modify] == "true"
+        @attendance.update(item)
+        flash[:success] = "更新しました"
+      else
+        flash[:danger] = "更新できなかったものあります"
+      end
+    end
+    redirect_to @user
+  end
+
+ 
 
 private
   # 1ヶ月分の勤怠情報を扱います。
@@ -85,6 +123,14 @@ private
 
   def change_params
     params.require(:user).permit(attendances: [:before_changed_started_at, :before_changed_finished_at, :day_status, :day_modify])[:attendances]
+  end
+
+  def overtime_confirmation_params
+    params.require(:attendance).permit(:overwork_time, :overwork_tomorrow, :overwork_note,:overwork_sperior).merge(overwork_status: "申請中")
+  end
+
+  def overtime_approval_params
+    params.require(:user).permit(attendances: [:overwork_modify, :overwork_status])[:attendances]
   end
 
 
