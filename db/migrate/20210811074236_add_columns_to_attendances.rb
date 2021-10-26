@@ -15,5 +15,8 @@ class AddColumnsToAttendances < ActiveRecord::Migration[5.1]
     add_column :attendances, :overwork_note, :string
     add_column :attendances, :overwork_sperior, :string
     add_column :attendances, :overwork_modify, :boolean, default: false
+    add_column :attendances, :log_changed_started_at, :datetime
+    add_column :attendances, :log_changed_finished_at, :datetime
+    add_column :attendances, :approved_time, :datetime
   end
 end

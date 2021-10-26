@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     @day_count = Attendance.where(day_status: '申請中', day_sperior: @user.belonging).count
     @approval = Attendance.find_by(month_status: '承認', worked_on: @first_day, user_id: @user.id)
     @deny = Attendance.find_by(month_status: '否認', worked_on: @first_day, user_id: @user.id)
-   end
+  end
   
   def index
     @users = if params[:search]
@@ -59,13 +59,13 @@ class UsersController < ApplicationController
   end
   
   def update
-  @user = User.find(params[:id])
-  if @user.update_attributes(user_params)
-    flash[:success] = "ユーザー情報を更新しました。"
-    redirect_to users_path
-  else
-    render :edit
-  end
+    @user = User.find(params[:id])
+    if @user.update_attributes(user_params)
+      flash[:success] = "ユーザー情報を更新しました。"
+      redirect_to users_path
+    else
+      render :edit
+    end
   end
   
   def destroy

@@ -96,8 +96,11 @@
     <tbody>
       <% @attendances.each do |day| %>
         <% if day.day_status == '承認' %>
+          <% day.log_changed_started_at = day.started_at %>
+          <% day.log_changed_finished_at = day.finished_at %>
           <% day.started_at = day.before_changed_started_at %>
           <% day.finished_at = day.before_changed_finished_at %>
+          <% day.save %>
         <% end %>
         <tr>
           <% if @user == current_user %>

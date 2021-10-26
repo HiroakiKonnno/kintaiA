@@ -57,12 +57,11 @@ class AttendancesController < ApplicationController
       if item[:day_modify] == "true"
         @attendance.update_attributes(item)
         flash[:success] = "勤怠情報を更新しました。"
-        redirect_to user_url(date: params[:date])
       else
         flash[:danger] = "更新できなかった勤怠情報があります"
-        redirect_to user_url(date: params[:date])
       end
     end
+    redirect_to user_url(date: params[:date])
   end
 
 
@@ -86,11 +85,10 @@ class AttendancesController < ApplicationController
     if overtime_confirmation_params[:overwork_time].present?
       @attendance.update_attributes(overtime_confirmation_params)
       flash[:success] = "勤怠情報を更新しました。"
-      redirect_to user_url(date: params[:date])
     else
       flash[:danger] = "終了時間が未入力です"
-      redirect_to user_url(date: params[:date])
     end
+    redirect_to user_url(date: params[:date])
   end
 
   def overtime_view
@@ -112,6 +110,20 @@ class AttendancesController < ApplicationController
     end
     redirect_to @user
   end
+  
+  def user_log
+    @user = User.find(params[:id])
+    @user.log = if params["log(1i)"]
+      DateTime.new(
+        params["log(1i)"].to_i,
+        params["log(2i)"].to_i,
+        params["log(3i)"].to_i
+      )
+    else
+      Time.now.strftime("%Y-%m-%d")
+    end
+    @attendances = @user.attendances.where(day_status: '承認').where('worked_on Like?', "%#{@user.log.strftime("%Y-%m")}%")
+  end
 
  
 
@@ -122,7 +134,7 @@ private
   end
 
   def change_params
-    params.require(:user).permit(attendances: [:before_changed_started_at, :before_changed_finished_at, :day_status, :day_modify])[:attendances]
+    params.require(:user).permit(attendances: [:before_changed_started_at, :before_changed_finished_at, :day_status, :day_modify, :approved_time])[:attendances]
   end
 
   def overtime_confirmation_params

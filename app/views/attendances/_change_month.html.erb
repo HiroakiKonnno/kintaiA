@@ -50,6 +50,7 @@
                 <th><%= update.select :day_status, ['申請中', '承認','否認','なし'], class: 'sample' %></th>
                 <th><%= update.check_box :day_modify, {class: "check_box"}, "true", "false" %></th>
                 <th><%= link_to "確認", user_path(user, date: day.worked_on), class: "btn btn-primary" %></th>
+                <th><%= update.hidden_field :approved_time, value: Time.now %></th>
               </tr>
             </table>
           <% end %>

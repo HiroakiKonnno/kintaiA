@@ -1,28 +1,29 @@
 <h1>勤怠ログ</h1>
-  
-  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
   <tr>
-      <div>
-        <%= date_select 'date-with-stylesheet', '', {discard_day: true}, {class: "form-control bootstrap-date-only-width"} %>
-      </div>
+    <%= form_with url: attendances_user_log_user_path, local: true, method: :get do |f| %>
+      <td><%= f.date_select :log, discard_day:true, :selected => @user.log %></td>
+      <td><%= f.submit "検索", class: 'btn btn-primary'%></td>
+    <% end %>
   </tr>
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <tr>
+      <th>日付</th>
+      <th>変更前出社時間</th>
+      <th>変更前退社時間</th>
+      <th>変更後出社時間</th>
+      <th>変更後退社時間</th>
+      <th>指示者</th>
+      <th>承認日</th>
+    </tr>
+    <% @attendances.each do |attendance| %>
       <tr>
-        <th>日付</th>
-        <th>変更前出社時間</th>
-        <th>変更前退社時間</th>
-        <th>変更後出社時間</th>
-        <th>変更後退社時間</th>
-        <th>指示者</th>
-        <th>承認日</th>
+        <th><%= attendance.worked_on %></th>
+        <th><%= attendance.log_changed_started_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <th><%= attendance.log_changed_finished_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <th><%= attendance.started_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <th><%= attendance.finished_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <th><%= attendance.day_sperior %></th>
+        <th><%= attendance.approved_time.strftime( '%Y-%m-%d' ) %></th>
       </tr>
-   
-      <tr>
-        <th><%=  %></th>
-        <th><%= %></th>
-        <th><%=  %></th>
-        <th><%=  %></th>
-        <th><%=  %></th>
-        <th><%=  %></th>
-      </tr>
-
+    <% end %>
   </table>
