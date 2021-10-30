@@ -31,7 +31,7 @@ class UsersController < ApplicationController
   else
       User.paginate(page: params[:page])
   end
-    @employees = @user.attendances.where.not(started_at: nil).where(finished_at: nil)
+    @employees = @user.attendances.where.not(started_at: nil).where(finished_at: nil).where('worked_on Like?', "%#{Time.now.strftime("%m-%d")}%")
   end
 
   def import
