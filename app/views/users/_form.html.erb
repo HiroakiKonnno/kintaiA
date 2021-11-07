@@ -1,8 +1,7 @@
     <% provide(:class_text, 'user--edit') %>
     <% provide(:button_text, '編集する') %>
     
-    <%= form_with model: @user,url:user_path(user.id), local: true, method: :patch do |f| %>
-
+    <%= form_with model: @user, url:user_path(user.id), local: true, method: :patch do |f| %>
 
       <%= f.label :"名前", class: "label-#{yield(:class_text)}" %>
       <%= f.text_field :name, value: user.name, class: "form-control" %>

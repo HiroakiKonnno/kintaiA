@@ -17,8 +17,14 @@ module ApplicationHelper
     # どれにも当てはまらなかった場合はfalseを返します。
     return false
   end
+
   def working_times(start, finish)
     format("%.2f", (((finish - start) / 60) / 60.0))
   end
+
+  def working_times_t(start, finish)
+    format("%.2f", ((((finish + 86400) - start) / 60) / 60.0))
+  end
+
 end
 

@@ -33,16 +33,16 @@
     </thead>
 　　
     <% @users.each do |user| %>
-    <div><%= user.name %></div>
-    <div><%= link_to "削除", user_path(user.id), method: :delete, class: "btn btn btn-primary"%></div>
-    <button type="button" class="btn btn btn-primary" data-toggle="collapse" data-target="#<%= user.id %>">編集</button>
-      <div id="<%= user.id %>" class="collapse">
-        <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-            <%= render 'form', {user: user} %>
+      <div><%= user.name %></div>
+      <div><%= link_to "削除", user_path(user.id), method: :delete, class: "btn btn btn-primary"%></div>
+      <button type="button" class="btn btn btn-primary" data-toggle="collapse" data-target="#<%= user.id %>">編集</button>
+        <div id="<%= user.id %>" class="collapse">
+          <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+              <%= render 'form', {user: user} %>
+            </div>
           </div>
         </div>
-      </div>
     <% end %>
   </table>
   <%= will_paginate %>

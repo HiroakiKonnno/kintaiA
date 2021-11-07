@@ -18,3 +18,6 @@ def over_time(endtime, format_work_end)
   format("%.2f", (((endtime - format_work_end) / 60) / 60.0))
 end
 
+def over_time_t(endtime, format_work_end)
+  format("%.2f", ((((endtime + 86400) - format_work_end) / 60) / 60.0))
+end

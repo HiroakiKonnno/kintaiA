@@ -5,6 +5,9 @@ class AttendancesController < ApplicationController
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
   before_action :set_one_month, only: :edit_one_month
   before_action :correct_user, only: :update_one_month
+  before_action :started_at_is_invalid_without_finished_at, only: :update_one_month
+  before_action :before_changed_finished_at_is_invalid_without_a_started_at, only: :update_one_month
+
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
   
   def update
@@ -12,9 +15,11 @@ class AttendancesController < ApplicationController
     @attendance = Attendance.find(params[:id])
     # 出勤時間が未登録であることを判定します。
     if @attendance.started_at.nil?
+      debugger
       if @attendance.update_attributes(started_at: Time.current.change(sec: 0))
         flash[:info] = "おはようございます！"
       else
+        debugger
         flash[:danger] = UPDATE_ERROR_MSG
       end
     elsif @attendance.finished_at.nil?
@@ -28,6 +33,11 @@ class AttendancesController < ApplicationController
   end
 
   def edit_one_month
+    @approvers_array = []
+    @approvers = User.where(superior: true).where.not(id: current_user.id)
+    @approvers.each do |approver|
+      @approvers_array.push(approver.name)
+    end
   end
 
 
@@ -47,7 +57,7 @@ class AttendancesController < ApplicationController
 
   def change_month
     @user = User.find(params[:id])
-    @attendances = Attendance.where(day_status: '申請中', day_sperior: @user.belonging).group_by(&:user_id)
+    @attendances = Attendance.where(day_status: '申請中', day_sperior: @user.name).group_by(&:user_id)
   end
 
   def change_approval
@@ -78,27 +88,34 @@ class AttendancesController < ApplicationController
   def overtime_info
     @user = User.find(params[:id])
     @attendance = @user.attendances.find_by(worked_on: params[:date])
+    @approvers_array = []
+    @approvers = User.where(superior: true).where.not(id: current_user.id)
+    @approvers.each do |approver|
+      @approvers_array.push(approver.name)
+    end
   end
 
   def overtime_confirmation
-    @attendance = Attendance.find(params[:id])
+    @user = User.find(params[:id])
+    @attendance = @user.attendances.find_by(worked_on: params[:date])
     if overtime_confirmation_params[:overwork_time].present?
       @attendance.update_attributes(overtime_confirmation_params)
       flash[:success] = "勤怠情報を更新しました。"
     else
       flash[:danger] = "終了時間が未入力です"
     end
-    redirect_to user_url(date: params[:date])
+    redirect_to user_url
+
   end
 
   def overtime_view
     @user = User.find(params[:id])
-    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.belonging).group_by(&:user_id)
+    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.name).group_by(&:user_id)
   end
 
   def overtime_approval
     @user = User.find(params[:id])
-    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.belonging)
+    @attendances = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.name)
     overtime_approval_params.each do |id, item|
       @attendance = Attendance.find(id)
       if item[:overtime_modify] == "true"
@@ -123,6 +140,15 @@ class AttendancesController < ApplicationController
       Time.now.strftime("%Y-%m-%d")
     end
     @attendances = @user.attendances.where(day_status: '承認').where('worked_on Like?', "%#{@user.log.strftime("%Y-%m")}%")
+    @attendances.each do |day|
+      if day.day_status == '承認'
+        day.log_changed_started_at = day.started_at
+        day.log_changed_finished_at = day.finished_at
+        day.started_at = day.before_changed_started_at
+        day.finished_at = day.before_changed_finished_at
+        day.save
+      end
+    end
   end
 
  
@@ -138,7 +164,7 @@ private
   end
 
   def overtime_confirmation_params
-    params.require(:attendance).permit(:overwork_time, :overwork_tomorrow, :overwork_note,:overwork_sperior).merge(overwork_status: "申請中")
+    params.require(:attendance).permit(:overwork_time, :overwork_tomorrow, :overwork_note,:overwork_sperior,:worked_on).merge(overwork_status: "申請中")
   end
 
   def overtime_approval_params
@@ -154,4 +180,15 @@ private
       redirect_to(root_url)
     end  
   end
+
+  def started_at_is_invalid_without_finished_at
+    @attendance = Attendance.find(params[:id])
+    errors.add(:finished_at, "が必要です") if @attendance.finished_at.blank? && @attendance.started_at.present?
+  end
+
+  def before_changed_finished_at_is_invalid_without_a_started_at
+    @attendance = Attendance.find(params[:id])
+    errors.add(:before_changed_finished_at, "が必要です") if @attendance.before_changed_finished_at.blank? && @attendance.before_changed_started_at.present?
+  end
+
 end

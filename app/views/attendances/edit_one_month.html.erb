@@ -35,7 +35,7 @@
                 <% end %>
               </td>
               <td><%= attendance.text_field :note, class: "form-control" %></td>
-              <td><%= attendance.select :day_sperior, ['上長A', '上長B'],include_blank: true, class: 'sample' %></td>
+              <td><%= attendance.select :day_sperior, @approvers_array,include_blank: true, class: 'sample' %></td>
             </tr>
           <% end %>
         <% end %>

@@ -2,11 +2,13 @@
 <div>
   <table class="table table-bordered table-condensed user-table">
     <tr>
+    <% if @user == current_user %>
       <td>
         <%= link_to "⇦", user_path(date: @first_day.prev_month), class: "btn btn-primary" %>
         <%= l(@first_day, format: :middle) %>時間管理表
         <%= link_to "⇨", user_path(date: @first_day.next_month), class: "btn btn-primary" %>
       </td>
+    <% end %>
       <td>指定勤務時間：<%= format_basic_info(@user.work_time) %></td>
       <td colspan="2">基本時間：<%= format_basic_info(@user.basic_time) %></td>
       <td>初日：<%= l(@first_day, format: :short) %></td>
@@ -20,7 +22,7 @@
       <td>締め：<%= l(@last_day, format: :short) %></td>
     </tr>
   </table>
-    <% if @user.belonging == "上長A" || @user.belonging == "上長B" %>
+    <% if @user.superior == true %>
       <div class = 'dec'>
         <% if @month_count == 0 %>
           <%= link_to "【所属長承認申請のお知らせ】", monthly_confirmation_info_user_path, remote: true %>
@@ -35,7 +37,7 @@
         <% if @day_count == 0 %>
           <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
         <% else %>
-          <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, remote: true %>
+          <%= link_to "【勤怠変更申請のお知らせ】", attendances_change_month_user_path, class: "link",remote: true %>
           <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
             <%= @day_count %>個の通知があります
           </span>
@@ -45,7 +47,7 @@
         <% if @overtime_count == 0 %>
           <%= link_to "【残業申請のお知らせ】", attendances_overtime_view_user_path, remote: true %>
         <% else %>
-          <%= link_to "【残業申請のお知らせ】", attendances_overtime_view_user_path, remote: true %>
+          <%= link_to "【残業申請のお知らせ】", attendances_overtime_view_user_path, class: "link",remote: true %>
           <span style="padding: 1px; margin-bottom: 1px;  border: 1px solid #FF0000; color: #FF0000; font-weight:  bold;">
             <%= @overtime_count %>個の通知があります
           </span>
@@ -55,7 +57,7 @@
   <% if @user == current_user %>
     <div class="btn-users-show">
       <%= link_to "勤怠編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
-      <%= link_to "CSV出力", "#", class: "btn btn-primary" %>
+      <%= link_to "CSV出力", csv_download_users_path(date: @first_day), class: "btn btn-primary" %>
     </div>
 
     <div class="btn-users-show">
@@ -95,13 +97,6 @@
 
     <tbody>
       <% @attendances.each do |day| %>
-        <% if day.day_status == '承認' %>
-          <% day.log_changed_started_at = day.started_at %>
-          <% day.log_changed_finished_at = day.finished_at %>
-          <% day.started_at = day.before_changed_started_at %>
-          <% day.finished_at = day.before_changed_finished_at %>
-          <% day.save %>
-        <% end %>
         <tr>
           <% if @user == current_user %>
             <td><%= link_to "残業申請", attendances_overtime_info_user_path(@user, date:day.worked_on), remote: true, class: "btn btn-primary" %></td>
@@ -112,18 +107,25 @@
           <td class='<%= "wday#{day.worked_on.wday}"%>'> <%=$days_of_the_week[day.worked_on.wday] %></td>
           <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
           <td><%= l(day.started_at.floor_to(15.minutes), format: :minute) if day.started_at.present? %></td>
-          
-          <td>
-            <% if btn_text = attendance_state(day) %>
-              <%= link_to "#{btn_text}", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" %>
-            <% end %>
-          </td>
+          <% if @user == current_user %>
+            <td>
+              <% if btn_text = attendance_state(day) %>
+                <%= link_to "#{btn_text}", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" %>
+              <% end %>
+            </td>
+          <% elsif %>
+            <td></td>
+          <% end %>
           <td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
           <td><%= l(day.finished_at.floor_to(15.minutes), format: :minute) if day.finished_at.present? %></td>
           <td>
             <% if day.started_at.present? && day.finished_at.present? %>
-              <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-              <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
+              <% if day.day_tomorrow == true %>
+                <%= str_times = working_times_t(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+              <% else %>
+                <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+              <% end %>
+                <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
           <td><%= day.note %></td>
@@ -132,11 +134,14 @@
           <td></td>
           <td></td>
           <td>
-            <% if day.day_status == '承認' %>
+            <% if day.overwork_status == '承認' %>
               勤怠編集を承認しました
-            <% elsif day.day_status == '否認' %>
+            <% elsif day.overwork_status == '否認' %>
               勤怠編集を否認しました
+            <% elsif day.overwork_status == '申請中' %>
+              <%= day.overwork_sperior %> に申請中
             <% else %>
+            
             <% end %>
           </td>
         </tr>
@@ -163,12 +168,18 @@
             所属長承認 <%= @approval.month_sperior %> から 承認済み
           <% elsif @deny.present? && @deny.month_status == "否認" %>
             所属長承認 <%= @deny.month_sperior %> から 否認済み
+          <% elsif @declare.present? && @declare.month_status == "申請中" %>
+            <%= @declare.month_sperior %> に申請中
           <% else %>
             所属長承認 未
          <% end %>
          <% if @user == current_user %>
             <%= form_with model: @attendance, url: update_confirmation_user_path(@user), local: true, method: :patch do |f| %>
-              <%= f.select :month_sperior, ['上長A', '上長B'], class: 'sample' %>
+              <% if @approvers_array.empty? %>
+                <%= f.select :month_sperior, "[承認権限者がいません]", class: 'sample' %>
+              <% else %>
+                <%= f.select :month_sperior, @approvers_array,include_blank: true, class: 'sample' %>
+              <% end %>
               <%= f.hidden_field :worked_on, value: @first_day %>
               <%= f.submit '送信', class: 'btn btn-primary btn-block' %>
             <% end %>

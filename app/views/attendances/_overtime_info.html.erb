@@ -1,5 +1,5 @@
 <div class="modal-dialog modal-lg modal-dialog-center">
-  <%= form_with model: @attendance, url: attendances_overtime_confirmation_user_path(@user), local: true, method: :patch do |f| %>
+  <%= form_with model: @attendance, url: attendances_overtime_confirmation_user_path(@user,date:@attendance.worked_on), local: true, method: :patch do |f| %>
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title">残業申請</h1>
@@ -19,10 +19,11 @@
           <td><%= f.time_field :overwork_time, class: "form-control" %></td>
           <th><%= f.check_box :overwork_tomorrow, {class: "check_box"}, "true", "false" %></th>
           <td><%= f.text_field :overwork_note, class: "form-control" %></td>
-          <td><%= f.select :overwork_sperior,['上長A', '上長B'], include_blank: true, class: 'sample' %></td>
+          <td><%= f.select :overwork_sperior,@approvers_array, include_blank: true, class: 'sample' %></td>
         </tr>
       </table>
       <div class="center">
+        <%= f.hidden_field :worked_on, value: @attendance.worked_on %>
         <%= f.submit "残業を申請する", class: "btn btn-lg btn-primary" %>
       </div>
     </div>

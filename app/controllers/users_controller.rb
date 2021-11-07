@@ -8,18 +8,27 @@ class UsersController < ApplicationController
   
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
-    @month_count = Attendance.where(month_status: '申請中', month_sperior: @user.belonging).count
-    @overtime_count = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.belonging).count
-    @day_count = Attendance.where(day_status: '申請中', day_sperior: @user.belonging).count
+    @month_count = Attendance.where(month_status: '申請中', month_sperior: @user.name).count
+    @overtime_count = Attendance.where(overwork_status: '申請中', overwork_sperior: @user.name).count
+    @day_count = Attendance.where(day_status: '申請中', day_sperior: @user.name).count
     @approval = Attendance.find_by(month_status: '承認', worked_on: @first_day, user_id: @user.id)
     @deny = Attendance.find_by(month_status: '否認', worked_on: @first_day, user_id: @user.id)
+    @declare = Attendance.find_by(month_status: '申請中', worked_on: @first_day, user_id: @user.id)
+    @approvers_array = []
+    @approvers = User.where(superior: true).where.not(id: current_user.id)
+    @approvers.each do |approver|
+      @approvers_array.push(approver.name)
+    end
+    if @user.admin
+      redirect_to users_url
+    end
   end
   
   def index
     @users = if params[:search]
-    User.paginate(page: params[:page]).where('name LIKE ?',"%#{params[:search]}%")
+    User.paginate(page: params[:page]).where('name LIKE ?',"%#{params[:search]}%").where.not(admin: true)
   else
-    User.paginate(page: params[:page])
+    User.paginate(page: params[:page]).where.not(admin: true)
   end
   
   end
@@ -89,15 +98,19 @@ class UsersController < ApplicationController
   def update_confirmation
     @user = User.find(params[:id])
     @attendance = @user.attendances.where(worked_on: params[:worked_on])
-    @attendance.update(confirmation_info_params)
-      flash[:success] = "送信は成功しました。"
+    if confirmation_info_params[:month_sperior].present?
+      @attendance.update(confirmation_info_params)
+        flash[:success] = "送信は成功しました。"
+    else
+      flash[:danger] = "申請先を選んでください"
+    end
       redirect_to @user
   end
 
   def monthly_confirmation_info
     @user = User.find(params[:id])
     @attendance = @user.attendances.where(worked_on: params[:worked_on])
-    @attendances = Attendance.where(month_status: '申請中', month_sperior: @user.belonging).group_by(&:user_id)
+    @attendances = Attendance.where(month_status: '申請中', month_sperior: @user.name).group_by(&:user_id)
   end
 
   def approve_monthly_info
@@ -115,6 +128,14 @@ class UsersController < ApplicationController
     redirect_to @approver
   end
 
+  def csv_download
+    user = User.find_by(id: current_user)
+    @first_day = params[:date].to_date
+    @last_day = @first_day.end_of_month
+    @attendances = user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
+    send_data render_to_string, filename: "attendances.csv", type: :csv
+  end
+
   
      private
    
@@ -129,7 +150,8 @@ class UsersController < ApplicationController
   
    def admin_or_correct_user
     @user = User.find(params[:user_id]) if @user.blank?
-    unless current_user?(@user) || current_user.admin?
+    @superior = current_user
+    unless current_user?(@user) || current_user.admin? || @superior.superior == true
       flash[:danger] = "編集権限がありません。"
       redirect_to(root_url)
     end  

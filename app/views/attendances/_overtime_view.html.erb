@@ -26,7 +26,11 @@
                   <td class='<%= "wday#{day.worked_on.wday}"%>'> <%= %w{日 月 火 水 木 金 土}[day.worked_on.wday] %></td>
                   <td><%= day.overwork_time.strftime( "%H:%M" ) %></td>
                   <td><%= user.designated_work_end_time.strftime( "%H:%M" ) %></td>
-                  <td><%= over_time(day.overwork_time.change(year: 2000, month: 1, day: 1), user.designated_work_end_time.change(year: 2000, month: 1, day: 1)) %></td>
+                  <% if day.overwork_tomorrow == true %>
+                    <td><%= over_time_t(day.overwork_time.change(year: 2000, month: 1, day: 1), user.designated_work_end_time.change(year: 2000, month: 1, day: 1)) %></td>
+                  <% else %>
+                    <td><%= over_time(day.overwork_time.change(year: 2000, month: 1, day: 1), user.designated_work_end_time.change(year: 2000, month: 1, day: 1)) %></td>
+                  <% end %>
                   <td><%= day.overwork_note %></td>
                   <td><%= update.select :overwork_status, ['申請中', '承認','否認','なし'], class: 'sample' %></td>
                   <td><%= update.check_box :overwork_modify, {class: "check_box"}, "true", "false" %></td>

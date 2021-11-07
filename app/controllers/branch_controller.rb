@@ -1,4 +1,7 @@
 class BranchController < ApplicationController
+
+  before_action :admin_user, only: [:index]
+
   def index
     @branches = if params[:search]
         Branch.paginate(page: params[:page]).where('name LIKE ?',"%#{params[:search]}%")
@@ -40,5 +43,7 @@ class BranchController < ApplicationController
     def branch_params
       params.permit(:name, :number, :kind)
     end
+
+    
    
 end

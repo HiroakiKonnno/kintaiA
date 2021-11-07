@@ -11,7 +11,10 @@ Rails.application.routes.draw do
 
 
   resources :users do
-    collection { post :import }
+    collection do
+       post :import 
+       get :csv_download, defaults: { format: 'csv' }
+    end
     member do
       get 'monthly_confirmation_info'
       patch 'approve_monthly_info'

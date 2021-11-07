@@ -5,6 +5,39 @@
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <%= render 'form' %>
+  <%= form_with model: @user, url:user_path(@user), local: true, method: :patch do |f| %>
+
+    <%= f.label :"名前", class: "label-#{yield(:class_text)}" %>
+    <%= f.text_field :name, value: @user.name, class: "form-control" %>
+
+    <%= f.label :"メールアドレス", class: "label-#{yield(:class_text)}" %>
+    <%= f.email_field :email, value: @user.email, class: "form-control" %>
+    
+    <%= f.label :"所属", class: "label-#{yield(:class_text)}" %>
+    <%= f.text_field :belonging, value: @user.belonging, class: "form-control" %>
+
+    <%= f.label :"社員番号", class: "label-#{yield(:class_text)}" %>
+    <%= f.text_field :employee_number, value: @user.employee_number, class: "form-control" %>
+
+    <%= f.label :カードID, class: "label-#{yield(:class_text)}" %>
+    <%= f.text_field :uid, value: @user.uid, class: "form-control" %>
+
+    <%= f.label :パスワード, class: "label-#{yield(:class_text)}" %>
+    <%= f.password_field :password, class: "form-control" %>
+
+    <%= f.label :パスワード確認用, class: "label-#{yield(:class_text)}" %>
+    <%= f.password_field :password_confirmation, class: "form-control" %>
+
+    <%= f.label :"基本勤務時間", class: "label-#{yield(:class_text)}" %>
+　    <%= f.time_field :basic_time, value: @user.basic_time.floor_to(15.minutes).strftime( "%H:%M" ), class: "form-control" %>
+
+    <%= f.label :"指定勤務開始時間", class: "label-#{yield(:class_text)}" %>
+　    <%= f.time_field :designated_work_start_time, value: @user.designated_work_start_time.floor_to(15.minutes).strftime( "%H:%M" ), class: "form-control" %>
+
+    <%= f.label :"指定勤務終了時間", class: "label-#{yield(:class_text)}" %>
+　    <%= f.time_field :designated_work_end_time, value: @user.designated_work_end_time.floor_to(15.minutes).strftime( "%H:%M" ), class: "form-control" %>
+
+    <%= f.submit :"編集", class: "btn btn-primary btn-block btn-#{yield(:class_text)}" %>
+  <% end %>
   </div>
 </div>

@@ -18,8 +18,16 @@
     <% @attendances.each do |attendance| %>
       <tr>
         <th><%= attendance.worked_on %></th>
-        <th><%= attendance.log_changed_started_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
-        <th><%= attendance.log_changed_finished_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <% if attendance.log_changed_started_at.nil? %>
+          <th></th>
+        <% else %>
+          <th><%= attendance.log_changed_started_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <% end %>
+        <% if attendance.log_changed_started_at.nil? %>
+          <th></th>
+        <% else %>
+          <th><%= attendance.log_changed_finished_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
+        <% end %>
         <th><%= attendance.started_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
         <th><%= attendance.finished_at.floor_to(15.minutes).strftime( "%H:%M" ) %></th>
         <th><%= attendance.day_sperior %></th>
